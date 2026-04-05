@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description:
     "Plateforme SaaS d'agents IA autonomes pour les PME francaises. Emails, commercial, admin, support, direction — sans informatique.",
   metadataBase: new URL(APP_URL),
-  icons: { icon: "/favicon.ico" },
+  icons: { icon: "/favicon.svg" },
   keywords: [
     "IA",
     "agents IA",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
       "Deployez des agents IA autonomes qui traitent vos emails, qualifient vos prospects et gerent votre admin.",
     images: [
       {
-        url: `${APP_URL}/og-image.png`,
+        url: `${APP_URL}/og-image.svg`,
         width: 1200,
         height: 630,
         alt: "VotrIA — Agents IA pour PME",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     title: "VotrIA — Votre premier employe IA",
     description:
       "Agents IA autonomes pour les PME francaises. Emails, commercial, admin, support — sans code.",
-    images: [`${APP_URL}/og-image.png`],
+    images: [`${APP_URL}/og-image.svg`],
   },
   robots: {
     index: true,

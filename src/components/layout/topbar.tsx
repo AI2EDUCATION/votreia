@@ -238,25 +238,25 @@ function NotificationsDropdown({
 
     async function fetchNotifications() {
       try {
-        const res = await fetch("/api/trpc/notifications.list?batch=1&input=%7B%220%22%3A%7B%22limit%22%3A10%7D%7D");
+        const res = await fetch("/api/trpc/notifications.list,notifications.unreadCount", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            "0": { json: { limit: 10 } },
+            "1": { json: {} },
+          }),
+        });
         if (res.ok) {
           const data = await res.json();
-          const items = data?.[0]?.result?.data ?? [];
-          if (mounted) setNotifications(items);
+          const items = data?.[0]?.result?.data?.json ?? data?.[0]?.result?.data ?? [];
+          const count = data?.[1]?.result?.data?.json ?? data?.[1]?.result?.data ?? 0;
+          if (mounted) {
+            setNotifications(Array.isArray(items) ? items : []);
+            setUnreadCount(typeof count === "number" ? count : 0);
+          }
         }
       } catch {
-        // silently fail
-      }
-
-      try {
-        const res = await fetch("/api/trpc/notifications.unreadCount?batch=1&input=%7B%220%22%3A%7B%7D%7D");
-        if (res.ok) {
-          const data = await res.json();
-          const count = data?.[0]?.result?.data ?? 0;
-          if (mounted) setUnreadCount(count);
-        }
-      } catch {
-        // silently fail
+        // silently fail — user might not be authenticated
       }
     }
 

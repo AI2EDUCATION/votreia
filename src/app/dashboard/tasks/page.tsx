@@ -181,10 +181,17 @@ export default async function TasksPage({
   );
 }
 
+const statColors: Record<string, string> = {
+  emerald: "bg-emerald-50 dark:bg-emerald-500/10",
+  blue: "bg-blue-50 dark:bg-blue-500/10",
+  red: "bg-red-50 dark:bg-red-500/10",
+  amber: "bg-amber-50 dark:bg-amber-500/10",
+};
+
 function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
   return (
     <div className="card p-4 flex items-center gap-3">
-      <div className={`w-9 h-9 rounded-lg bg-${color}-50 dark:bg-${color}-500/10 flex items-center justify-center shrink-0`}>
+      <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${statColors[color] ?? "bg-surface-50"}`}>
         {icon}
       </div>
       <div>

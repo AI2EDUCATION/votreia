@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#08090f"/>
+      <stop offset="50%" stop-color="#0f1117"/>
+      <stop offset="100%" stop-color="#1a1d2e"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#748ffc"/>
+      <stop offset="100%" stop-color="#4c6ef5"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="200" cy="100" r="300" fill="#4c6ef5" opacity="0.06"/>
+  <circle cx="1000" cy="500" r="250" fill="#7c3aed" opacity="0.05"/>
+  <rect x="80" y="240" width="56" height="56" rx="14" fill="url(#brand)"/>
+  <text x="115" y="278" text-anchor="middle" fill="white" font-family="system-ui,sans-serif" font-weight="700" font-size="28">V</text>
+  <text x="152" y="278" fill="white" font-family="system-ui,sans-serif" font-weight="700" font-size="32">VotrIA</text>
+  <text x="80" y="340" fill="white" font-family="system-ui,sans-serif" font-weight="700" font-size="48">Votre premier</text>
+  <text x="80" y="400" fill="#748ffc" font-family="system-ui,sans-serif" font-weight="700" font-size="48">employe IA.</text>
+  <text x="80" y="470" fill="#868e96" font-family="system-ui,sans-serif" font-weight="400" font-size="22">Agents IA autonomes pour les PME francaises</text>
+  <text x="80" y="500" fill="#868e96" font-family="system-ui,sans-serif" font-weight="400" font-size="22">Email · Commercial · Admin · Support · Direction</text>
+  <text x="80" y="580" fill="#495057" font-family="system-ui,sans-serif" font-weight="400" font-size="16">app.votria.fr</text>
+</svg>

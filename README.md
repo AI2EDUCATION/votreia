@@ -1,27 +1,26 @@
-# VotrIA — Votre premier employé IA
+# VotrIA — Votre premier employe IA
 
-Plateforme SaaS multi-tenant d'agents IA autonomes pour les PME françaises.
+Plateforme SaaS multi-tenant d'agents IA autonomes pour les PME francaises.
 
 ## Stack technique
 
 | Couche | Technologie |
 |--------|------------|
 | Frontend | Next.js 15 (App Router, RSC) |
-| UI | Tailwind CSS + shadcn/ui |
+| UI | Tailwind CSS, Lucide Icons, Dark mode |
 | Backend API | Next.js API Routes + tRPC |
-| Base de données | Supabase (PostgreSQL 15, RLS) |
+| Base de donnees | Supabase (PostgreSQL, RLS) |
 | ORM | Drizzle ORM |
-| Auth | Supabase Auth + RBAC |
+| Auth | Supabase Auth (password + magic link) |
 | Moteur IA | Anthropic Claude API (Sonnet 4 + Haiku 4.5) |
 | File d'attente | Inngest (jobs async, CRON, retries) |
 | Cache | Upstash Redis |
-| Paiement | Stripe |
+| Paiement | Stripe (checkout, portal, webhooks) |
 | Email | Resend |
-| SMS | Twilio |
-| Hébergement | Vercel + Supabase (eu-west-3 Paris) |
-| CDN / DDoS | Cloudflare |
+| SMS | Twilio (optionnel) |
+| Stockage | Supabase Storage (documents) |
 
-## Démarrage rapide
+## Demarrage rapide
 
 ```bash
 # 1. Cloner et installer
@@ -33,14 +32,15 @@ npm install
 cp .env.example .env.local
 # Remplir toutes les valeurs dans .env.local
 
-# 3. Configurer Supabase
-npx supabase start              # Local Docker
-npm run db:push                  # Appliquer le schéma Drizzle
-psql $DATABASE_URL < supabase/migrations/001_initial_rls.sql
+# 3. Pousser le schema DB
+npm run db:push
 
-# 4. Lancer le dev
-npm run dev                      # Next.js sur :3000
-npm run inngest:dev              # Inngest DevServer
+# 4. Seeder les donnees demo (optionnel)
+npm run db:seed
+
+# 5. Lancer le dev
+npm run dev          # Next.js sur :3000
+npm run inngest:dev  # Inngest DevServer (optionnel)
 ```
 
 ## Structure du projet
@@ -48,55 +48,92 @@ npm run inngest:dev              # Inngest DevServer
 ```
 votria/
 ├── src/
-│   ├── app/             ← Pages Next.js (App Router)
-│   │   ├── auth/        ← Login, signup, callback
-│   │   ├── dashboard/   ← Dashboard, agents, tasks, leads, docs, billing, settings
-│   │   └── api/         ← tRPC, webhooks (Stripe, Gmail), Inngest, onboarding
-│   ├── components/      ← UI React (layout, dashboard, agents, auth)
-│   ├── lib/             ← Clients (Supabase, Anthropic, Stripe, Resend, encryption)
-│   ├── agents/          ← Orchestrateur + tools par type d'agent
-│   ├── inngest/         ← Event client + fonctions async (jobs, CRON)
-│   ├── trpc/            ← tRPC init + routers (agents, tasks, leads, billing)
-│   └── db/              ← Drizzle schema + migrations
-├── supabase/
-│   └── migrations/      ← SQL RLS policies
-├── tests/               ← Vitest + Playwright
-└── scripts/             ← Scripts admin Python
+│   ├── app/                    ← Pages Next.js (App Router)
+│   │   ├── auth/               ← Login, signup, callback
+│   │   ├── dashboard/          ← 10 pages dashboard
+│   │   │   ├── agents/         ← CRUD agents + setup wizard + detail
+│   │   │   ├── tasks/          ← Liste + detail tache
+│   │   │   ├── leads/          ← Pipeline + detail + import CSV
+│   │   │   ├── documents/      ← Upload + classification auto
+│   │   │   ├── analytics/      ← Charts, performance, couts
+│   │   │   ├── notifications/  ← Liste notifications + mark read
+│   │   │   ├── billing/        ← Plans Stripe + portal
+│   │   │   ├── settings/       ← General, notifications, securite, integrations
+│   │   │   └── profile/        ← Profil utilisateur + export RGPD
+│   │   └── api/                ← tRPC, webhooks, upload, health
+│   ├── components/
+│   │   ├── ui/                 ← Modal, Toast, Pagination, Search
+│   │   ├── layout/             ← Sidebar, TopBar (command palette, dark mode)
+│   │   └── dashboard/          ← 15+ composants interactifs
+│   ├── lib/                    ← Clients (Supabase, Anthropic, Stripe, Resend...)
+│   ├── agents/                 ← Orchestrateur + simulateur trial
+│   ├── inngest/                ← Event client + 6 fonctions async
+│   ├── trpc/                   ← 8 routers (agents, tasks, leads, billing, settings, notifications, profile, usage)
+│   └── db/                     ← Drizzle schema (12 tables, 6 enums)
+├── public/                     ← Favicon, OG image
+├── scripts/                    ← Seed demo data
+└── tests/                      ← Vitest + Playwright
 ```
 
-## Agents IA
+## Fonctionnalites
 
-| Agent | Modèle | Fonction |
-|-------|--------|----------|
-| Email | Sonnet 4 | Trie, répond, escalade les emails |
-| Commercial | Sonnet 4 | Qualifie leads, envoie devis, relances |
-| Admin | Haiku 4.5 + Sonnet 4 | Classe documents, extrait données |
-| Support | Sonnet 4 | Répond aux clients 24/7, crée tickets |
-| Direction | Sonnet 4 | Bilans quotidiens, suivi décisions |
+### Agents IA
+- 5 types : Email, Commercial, Admin, Support, Direction
+- Setup wizard 4 etapes (presentation → prompt → test → activation)
+- Configuration modal (prompt, outils, parametres avances)
+- Test simulation gratuit (0 EUR API)
+- Execution reelle avec suivi tokens/cout
+- Clonage d'agents
+- Chart activite 14 jours
 
-## Sécurité & RGPD
+### Dashboard
+- KPIs temps reel avec auto-refresh 60s
+- Onboarding checklist (5 etapes)
+- Analytics complet (charts, performance agents, funnel leads, couts)
+- Command palette (Ctrl+K)
+- Raccourcis clavier (G+D, G+A, G+T, G+L...)
+- Dark mode
+- Toasts feedback
 
-- RLS PostgreSQL — isolation par `tenant_id` sur chaque table
-- Chiffrement AES-256-GCM pour les tokens OAuth
-- TLS 1.3 (Cloudflare + Vercel)
-- Hébergement EU (Supabase eu-west-3 Paris)
-- Droit d'accès / oubli / portabilité implémentés
-- Audit trail sur toutes les actions admin
+### Pipeline commercial
+- CRUD leads avec recherche
+- Import bulk CSV (FR/EN, template telechargeable)
+- Page detail avec actions (status, score, notes)
+- Auto-qualification par agent commercial
 
-## Coûts infrastructure MVP
+### Documents
+- Upload drag & drop (20 Mo max, PDF/Word/Excel/Images)
+- Classification automatique par agent Admin
+- Download via signed URL (Supabase Storage)
 
-| Service | Coût/mois |
-|---------|-----------|
-| Vercel Pro | 20€ |
-| Supabase Pro | 25€ |
-| Upstash Redis | ~5€ |
-| Inngest Pro | 25€ |
-| Anthropic API (50 tenants) | ~600€ |
-| Resend Pro | 20€ |
-| Twilio | ~30€ |
-| Sentry Team | 26€ |
-| **Total** | **~752€/mois** |
+### Billing
+- Checkout Stripe (Essentiel 990 EUR, Pro 1900 EUR)
+- Portal client Stripe
+- Webhooks lifecycle (checkout, payment, cancellation)
+- Emails automatiques (bienvenue, echec paiement, annulation)
+
+### Securite
+- AES-256-GCM encryption (tokens OAuth)
+- CSP + HSTS + Permissions-Policy headers
+- Audit logging complet
+- Rate limiting (Upstash Redis)
+- Validation Zod sur tous les inputs
+- RGPD : export donnees, suppression compte
+
+## Seed demo
+
+```bash
+npm run db:seed
+```
+
+Cree :
+- 1 tenant "Demo PME SAS" (plan professionnel)
+- 1 user admin (demo@votria.fr)
+- 5 agents (3 actifs)
+- 50 taches avec metriques
+- 20 leads avec pipeline
+- 8 documents classes
 
 ## Licence
 
-Confidentiel — AI2 / DATAKOO — Tous droits réservés.
+Confidentiel — AI2 / DATAKOO — Tous droits reserves.
