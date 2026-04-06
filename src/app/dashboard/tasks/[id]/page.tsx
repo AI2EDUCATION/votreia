@@ -4,6 +4,7 @@ import { eq, and } from "drizzle-orm";
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { Clock, Cpu, CreditCard, Bot, Calendar, CheckCircle2, XCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { CopyButton } from "@/components/ui/copy-button";
 import { notFound } from "next/navigation";
 
 async function getTenantId() {
@@ -94,8 +95,9 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
       {/* Input */}
       {input && Object.keys(input).length > 0 && (
         <div className="card overflow-hidden">
-          <div className="px-5 py-3 border-b border-surface-100 dark:border-white/[0.06] bg-surface-50 dark:bg-white/[0.02]">
+          <div className="px-5 py-3 border-b border-surface-100 dark:border-white/[0.06] bg-surface-50 dark:bg-white/[0.02] flex items-center justify-between">
             <h3 className="font-semibold text-sm text-surface-900 dark:text-surface-50">Entree</h3>
+            <CopyButton text={JSON.stringify(input, null, 2)} />
           </div>
           <pre className="p-5 text-xs font-mono text-surface-600 dark:text-surface-400 overflow-x-auto whitespace-pre-wrap">
             {JSON.stringify(input, null, 2)}
@@ -106,8 +108,9 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
       {/* Output */}
       {output && (
         <div className="card overflow-hidden">
-          <div className="px-5 py-3 border-b border-surface-100 dark:border-white/[0.06] bg-surface-50 dark:bg-white/[0.02]">
+          <div className="px-5 py-3 border-b border-surface-100 dark:border-white/[0.06] bg-surface-50 dark:bg-white/[0.02] flex items-center justify-between">
             <h3 className="font-semibold text-sm text-surface-900 dark:text-surface-50">Resultat</h3>
+            <CopyButton text={JSON.stringify(output, null, 2)} />
           </div>
           <div className="p-5">
             {Boolean(output.text) && (

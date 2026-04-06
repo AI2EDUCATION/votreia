@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { AutoRefresh } from "@/components/dashboard/auto-refresh";
 import { OnboardingChecklist } from "@/components/dashboard/onboarding-checklist";
+import { QuickActions } from "@/components/dashboard/quick-actions";
 
 async function getTenantId() {
   const supabase = await createSupabaseServer();
@@ -120,6 +121,9 @@ export default async function DashboardPage() {
         hasDocuments={(docCount[0]?.count ?? 0) > 0}
         hasIntegration={(emailAccountCount[0]?.count ?? 0) > 0}
       />
+
+      {/* Quick actions */}
+      <QuickActions />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
