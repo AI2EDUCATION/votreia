@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /auth/callback
+Disallow: /auth/update-password
+
+Sitemap: https://app.votria.fr/sitemap.xml

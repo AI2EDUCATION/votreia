@@ -65,11 +65,21 @@ export class IntegrationError extends VotrIAError {
 export function logError(error: unknown, context?: Record<string, unknown>): void {
   const errorInfo = normalizeError(error);
 
+  // Sentry integration (opt-in via NEXT_PUBLIC_SENTRY_DSN env var)
+  if (typeof window !== "undefined" && (window as any).__SENTRY__) {
+    try {
+      (window as any).__SENTRY__.captureException(error, { extra: { ...errorInfo, ...context } });
+    } catch {
+      // Sentry not available
+    }
+  }
+
   if (process.env.NODE_ENV === "production") {
-    // TODO: Sentry.captureException(error, { extra: { ...errorInfo, ...context } });
+    // Structured JSON logging for Vercel / log aggregators
     console.error(JSON.stringify({
       timestamp: new Date().toISOString(),
       level: "error",
+      service: "votria",
       ...errorInfo,
       ...context,
     }));

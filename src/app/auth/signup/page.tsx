@@ -64,7 +64,7 @@ export default function SignupPage() {
         router.push("/dashboard");
       } else {
         // Email confirmation required
-        router.push("/auth/login?message=check-email");
+        router.push("/auth/verify-email");
       }
     } catch (err) {
       setError("Une erreur est survenue. Veuillez réessayer.");

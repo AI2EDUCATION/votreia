@@ -134,6 +134,58 @@ Cree :
 - 20 leads avec pipeline
 - 8 documents classes
 
+## Deploiement Vercel
+
+```bash
+# 1. Installer Vercel CLI
+npm i -g vercel
+
+# 2. Deployer
+vercel
+
+# 3. Configurer les env vars dans Vercel Dashboard:
+#    - Toutes les vars de .env.example
+#    - NEXT_PUBLIC_APP_URL = https://app.votria.fr
+#    - NODE_ENV = production
+
+# 4. Configurer les webhooks:
+#    - Stripe: https://app.votria.fr/api/webhooks/stripe
+#    - Gmail Pub/Sub: https://app.votria.fr/api/webhooks/gmail
+#    - Inngest: https://app.votria.fr/api/inngest
+```
+
+### Setup Supabase Production
+
+```bash
+# 1. Creer un projet sur supabase.com (region eu-west-3 Paris)
+# 2. Copier DATABASE_URL, SUPABASE_URL, ANON_KEY, SERVICE_ROLE_KEY
+
+# 3. Appliquer le schema
+DATABASE_URL=postgresql://... npm run db:push
+
+# 4. Appliquer les politiques RLS
+psql $DATABASE_URL < supabase/migrations/001_initial_rls.sql
+psql $DATABASE_URL < supabase/migrations/002_usage_tracking.sql
+
+# 5. Creer le bucket Storage "documents"
+# → Supabase Dashboard > Storage > New Bucket > "documents" (private)
+
+# 6. Optionnel: seeder les donnees demo
+DATABASE_URL=postgresql://... npm run db:seed
+```
+
+### Checklist pre-lancement
+
+- [ ] Env vars configurees sur Vercel
+- [ ] Supabase DB creee + schema pousse
+- [ ] Bucket Storage "documents" cree
+- [ ] Stripe webhooks configures
+- [ ] Domaine personnalise (app.votria.fr)
+- [ ] DNS configure (Vercel)
+- [ ] SSL actif (automatique Vercel)
+- [ ] Email verification active dans Supabase Auth settings
+- [ ] Inngest connecte (INNGEST_EVENT_KEY + SIGNING_KEY)
+
 ## Licence
 
 Confidentiel — AI2 / DATAKOO — Tous droits reserves.

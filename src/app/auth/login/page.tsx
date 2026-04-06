@@ -162,15 +162,9 @@ export default function LoginPage() {
             : "Mot de passe"}
         </button>
         {mode === "password" && (
-          <button
-            onClick={() => {
-              setMode("magic");
-              setError(null);
-            }}
-            className="text-sm text-surface-500 hover:text-surface-700 hover:underline"
-          >
+          <Link href="/auth/reset-password" className="text-sm text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 hover:underline">
             Mot de passe oublie ?
-          </button>
+          </Link>
         )}
       </div>
 
