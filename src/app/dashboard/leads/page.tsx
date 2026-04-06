@@ -3,7 +3,7 @@ import { leads, users } from "@/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { Plus, Users, TrendingUp, Trophy, Target } from "lucide-react";
-import { LeadsPageClient } from "./client";
+import { LeadsPageClient, LeadsExportButton } from "./client";
 import Link from "next/link";
 import { Suspense } from "react";
 import { SearchInput } from "@/components/ui/search-input";
@@ -70,6 +70,9 @@ export default async function LeadsPage({
           <Suspense fallback={<div className="w-64 h-10 skeleton rounded-lg" />}>
             <SearchInput placeholder="Rechercher un lead..." basePath="/dashboard/leads" />
           </Suspense>
+          {leadList.length > 0 && (
+            <LeadsExportButton data={leadList as unknown as Record<string, unknown>[]} />
+          )}
           <LeadsPageClient />
         </div>
       </div>

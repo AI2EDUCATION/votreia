@@ -2,8 +2,8 @@ import { db } from "@/db";
 import { leads, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { createSupabaseServer } from "@/lib/supabase-server";
-import { ArrowLeft, Mail, Phone, Building2, Calendar, Target, Globe } from "lucide-react";
-import Link from "next/link";
+import { Mail, Phone, Building2, Calendar, Target, Globe } from "lucide-react";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { notFound } from "next/navigation";
 import { LeadDetailActions } from "./client";
 
@@ -44,17 +44,11 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm">
-        <Link href="/dashboard/leads" className="flex items-center gap-1 text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-          Leads
-        </Link>
-        <span className="text-surface-300 dark:text-surface-600">/</span>
-        <span className="text-surface-900 dark:text-surface-50 font-medium">
-          {[lead.firstName, lead.lastName].filter(Boolean).join(" ") || lead.email || "Lead"}
-        </span>
-      </div>
+      <Breadcrumb items={[
+        { label: "Dashboard", href: "/dashboard" },
+        { label: "Leads", href: "/dashboard/leads" },
+        { label: [lead.firstName, lead.lastName].filter(Boolean).join(" ") || lead.email || "Lead" },
+      ]} />
 
       {/* Header card */}
       <div className="card p-6">

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Settings, Globe, Bell, Shield, Trash2, LogOut, Save, Check, ExternalLink, Loader2, Lock } from "lucide-react";
+import { Settings, Globe, Bell, Shield, Trash2, LogOut, Save, Check, ExternalLink, Loader2, Lock, Activity } from "lucide-react";
 import { trpc } from "@/lib/trpc-client";
+import { ServiceStatus } from "@/components/dashboard/service-status";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
@@ -12,6 +13,7 @@ export default function SettingsPage() {
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "security", label: "Securite", icon: Shield },
     { id: "integrations", label: "Integrations", icon: Globe },
+    { id: "status", label: "Statut", icon: Activity },
   ];
 
   return (
@@ -49,6 +51,7 @@ export default function SettingsPage() {
           {activeTab === "notifications" && <NotificationsTab />}
           {activeTab === "security" && <SecurityTab />}
           {activeTab === "integrations" && <IntegrationsTab />}
+          {activeTab === "status" && <StatusTab />}
         </div>
       </div>
     </div>
@@ -334,6 +337,18 @@ function IntegrationsTab() {
           )}
         </div>
       ))}
+    </div>
+  );
+}
+
+function StatusTab() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="font-semibold text-surface-900 dark:text-surface-50 mb-1">Statut des services</h3>
+        <p className="text-xs text-surface-400 mb-4">Verifiez la connectivite de tous les services externes.</p>
+      </div>
+      <ServiceStatus />
     </div>
   );
 }

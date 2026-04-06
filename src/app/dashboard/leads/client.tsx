@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Upload } from "lucide-react";
+import { Plus, Upload, Download } from "lucide-react";
 import { CreateLeadModal } from "@/components/dashboard/create-lead-modal";
 import { ImportLeadsModal } from "@/components/dashboard/import-leads-modal";
+import { ExportCSVButton } from "@/components/dashboard/export-button";
 
 export function LeadsPageClient() {
   const [createOpen, setCreateOpen] = useState(false);
@@ -24,5 +25,24 @@ export function LeadsPageClient() {
       <CreateLeadModal open={createOpen} onClose={() => setCreateOpen(false)} />
       <ImportLeadsModal open={importOpen} onClose={() => setImportOpen(false)} />
     </>
+  );
+}
+
+export function LeadsExportButton({ data }: { data: Record<string, unknown>[] }) {
+  return (
+    <ExportCSVButton
+      data={data}
+      filename={`leads-votria-${new Date().toISOString().split("T")[0]}`}
+      columns={[
+        { key: "firstName", label: "Prenom" },
+        { key: "lastName", label: "Nom" },
+        { key: "email", label: "Email" },
+        { key: "phone", label: "Telephone" },
+        { key: "company", label: "Entreprise" },
+        { key: "status", label: "Statut" },
+        { key: "score", label: "Score" },
+        { key: "source", label: "Source" },
+      ]}
+    />
   );
 }

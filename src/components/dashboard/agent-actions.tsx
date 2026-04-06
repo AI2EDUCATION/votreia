@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Play, Pause, Trash2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/toast";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function AgentToggleButton({ agentId, currentStatus }: { agentId: string; currentStatus: string }) {
   const router = useRouter();
@@ -43,47 +44,42 @@ export function AgentToggleButton({ agentId, currentStatus }: { agentId: string;
 
 export function AgentDeleteButton({ agentId }: { agentId: string }) {
   const router = useRouter();
-  const [confirming, setConfirming] = useState(false);
-
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const { success, error: toastError } = useToast();
 
   const deleteAgent = trpc.agents.delete.useMutation({
     onSuccess: () => {
       success("Agent supprime");
+      setConfirmOpen(false);
+      router.push("/dashboard/agents");
       router.refresh();
     },
     onError: (err) => {
       toastError("Impossible de supprimer", err.message);
-      setConfirming(false);
+      setConfirmOpen(false);
     },
   });
 
-  if (confirming) {
-    return (
-      <div className="flex items-center gap-1">
-        <button
-          className="btn-danger text-xs px-2 py-1"
-          onClick={() => deleteAgent.mutate({ agentId })}
-          disabled={deleteAgent.isPending}
-        >
-          {deleteAgent.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirmer"}
-        </button>
-        <button
-          className="btn-ghost text-xs px-2 py-1"
-          onClick={() => setConfirming(false)}
-        >
-          Non
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <button
-      className="btn-ghost text-sm px-3 py-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10"
-      onClick={() => setConfirming(true)}
-    >
-      <Trash2 className="w-4 h-4" />
-    </button>
+    <>
+      <button
+        className="btn-ghost text-sm px-3 py-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10"
+        onClick={() => setConfirmOpen(true)}
+        title="Supprimer"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => deleteAgent.mutate({ agentId })}
+        title="Supprimer cet agent ?"
+        description="Cette action est irreversible. Toutes les taches et logs associes seront supprimees. Les donnees ne pourront pas etre recuperees."
+        confirmLabel="Supprimer definitivement"
+        variant="danger"
+        loading={deleteAgent.isPending}
+      />
+    </>
   );
 }

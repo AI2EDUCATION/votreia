@@ -2,8 +2,9 @@ import { db } from "@/db";
 import { agents, agentLogs, tasks, users } from "@/db/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { createSupabaseServer } from "@/lib/supabase-server";
-import { ArrowLeft, Bot, Clock, CheckCircle2, XCircle, Activity, Zap, TrendingUp } from "lucide-react";
+import { Bot, Clock, CheckCircle2, XCircle, Activity, Zap, TrendingUp } from "lucide-react";
 import Link from "next/link";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { notFound } from "next/navigation";
 import { AgentDetailActions, AgentConfigSection, TriggerTaskButton } from "./client";
 import { AgentTaskChart } from "@/components/dashboard/agent-chart";
@@ -83,15 +84,11 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="space-y-6 max-w-5xl">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm">
-        <Link href="/dashboard/agents" className="flex items-center gap-1 text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-          Agents
-        </Link>
-        <span className="text-surface-300 dark:text-surface-600">/</span>
-        <span className="text-surface-900 dark:text-surface-50 font-medium">{agent.name}</span>
-      </div>
+      <Breadcrumb items={[
+        { label: "Dashboard", href: "/dashboard" },
+        { label: "Agents", href: "/dashboard/agents" },
+        { label: agent.name },
+      ]} />
 
       {/* Header */}
       <div className="card p-6">

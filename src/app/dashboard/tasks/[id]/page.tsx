@@ -2,8 +2,8 @@ import { db } from "@/db";
 import { tasks, agents, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { createSupabaseServer } from "@/lib/supabase-server";
-import { ArrowLeft, Clock, Cpu, CreditCard, Bot, Calendar, CheckCircle2, XCircle, AlertTriangle, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { Clock, Cpu, CreditCard, Bot, Calendar, CheckCircle2, XCircle, AlertTriangle, Loader2 } from "lucide-react";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { notFound } from "next/navigation";
 
 async function getTenantId() {
@@ -45,15 +45,11 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm">
-        <Link href="/dashboard/tasks" className="flex items-center gap-1 text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-          Taches
-        </Link>
-        <span className="text-surface-300 dark:text-surface-600">/</span>
-        <span className="text-surface-900 dark:text-surface-50 font-medium">{t.type}</span>
-      </div>
+      <Breadcrumb items={[
+        { label: "Dashboard", href: "/dashboard" },
+        { label: "Taches", href: "/dashboard/tasks" },
+        { label: t.type },
+      ]} />
 
       {/* Header */}
       <div className="card p-6">
