@@ -326,6 +326,8 @@ function CreditCardIcon({ className }: { className?: string }) {
 
 function CommandPalette({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState("");
+  const [dynamicResults, setDynamicResults] = useState<Array<{ label: string; href: string; icon: string; type: string }>>([]);
+  const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -333,38 +335,95 @@ function CommandPalette({ onClose }: { onClose: () => void }) {
     inputRef.current?.focus();
   }, []);
 
-  const commands = [
-    { label: "Tableau de bord", href: "/dashboard", icon: "📊" },
-    { label: "Agents IA", href: "/dashboard/agents", icon: "🤖" },
-    { label: "Taches", href: "/dashboard/tasks", icon: "📋" },
-    { label: "Leads", href: "/dashboard/leads", icon: "👥" },
-    { label: "Documents", href: "/dashboard/documents", icon: "📄" },
-    { label: "Facturation", href: "/dashboard/billing", icon: "💳" },
-    { label: "Parametres", href: "/dashboard/settings", icon: "⚙️" },
+  const pages = [
+    { label: "Tableau de bord", href: "/dashboard", icon: "📊", type: "page" },
+    { label: "Agents IA", href: "/dashboard/agents", icon: "🤖", type: "page" },
+    { label: "Taches", href: "/dashboard/tasks", icon: "📋", type: "page" },
+    { label: "Leads", href: "/dashboard/leads", icon: "👥", type: "page" },
+    { label: "Documents", href: "/dashboard/documents", icon: "📄", type: "page" },
+    { label: "Analytics", href: "/dashboard/analytics", icon: "📈", type: "page" },
+    { label: "Notifications", href: "/dashboard/notifications", icon: "🔔", type: "page" },
+    { label: "Facturation", href: "/dashboard/billing", icon: "💳", type: "page" },
+    { label: "Parametres", href: "/dashboard/settings", icon: "⚙️", type: "page" },
+    { label: "Mon profil", href: "/dashboard/profile", icon: "👤", type: "page" },
   ];
 
-  const filtered = query
-    ? commands.filter((c) =>
-        c.label.toLowerCase().includes(query.toLowerCase())
-      )
-    : commands;
+  const actions = [
+    { label: "Creer un agent", href: "/dashboard/agents", icon: "➕", type: "action" },
+    { label: "Ajouter un lead", href: "/dashboard/leads", icon: "➕", type: "action" },
+    { label: "Importer un document", href: "/dashboard/documents", icon: "📤", type: "action" },
+    { label: "Activer le dark mode", href: "#dark", icon: "🌙", type: "action" },
+  ];
+
+  // Dynamic search via tRPC when query >= 2 chars
+  useEffect(() => {
+    if (query.length < 2) {
+      setDynamicResults([]);
+      return;
+    }
+
+    const timeout = setTimeout(async () => {
+      setSearching(true);
+      try {
+        // Search leads
+        const res = await fetch(`/api/trpc/leads.list`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ json: { limit: 5 } }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const leads = (data?.result?.data?.json ?? data?.result?.data ?? []) as Array<Record<string, unknown>>;
+          const q = query.toLowerCase();
+          const matched = leads
+            .filter((l) =>
+              [l.firstName, l.lastName, l.email, l.company]
+                .filter(Boolean)
+                .some((v) => String(v).toLowerCase().includes(q))
+            )
+            .slice(0, 3)
+            .map((l) => ({
+              label: [l.firstName, l.lastName].filter(Boolean).join(" ") || String(l.email ?? "Lead"),
+              href: `/dashboard/leads/${l.id}`,
+              icon: "👤",
+              type: "lead",
+            }));
+          setDynamicResults(matched);
+        }
+      } catch {
+        // ignore
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [query]);
+
+  const q = query.toLowerCase();
+  const filteredPages = q ? pages.filter((p) => p.label.toLowerCase().includes(q)) : pages;
+  const filteredActions = q ? actions.filter((a) => a.label.toLowerCase().includes(q)) : [];
+
+  const allResults = [...filteredPages, ...filteredActions, ...dynamicResults];
 
   function navigate(href: string) {
+    if (href === "#dark") {
+      document.documentElement.classList.toggle("dark");
+      localStorage.setItem("votria-dark", String(document.documentElement.classList.contains("dark")));
+      onClose();
+      return;
+    }
     router.push(href);
     onClose();
   }
 
   return (
     <div className="command-palette" onClick={onClose}>
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div
         className="relative w-full max-w-lg bg-white dark:bg-[#1a1d2e] rounded-xl shadow-2xl border border-surface-200 dark:border-white/10 overflow-hidden animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Search input */}
         <div className="flex items-center gap-3 px-4 border-b border-surface-100 dark:border-white/[0.06]">
           <Search className="w-5 h-5 text-surface-400 shrink-0" />
           <input
@@ -372,40 +431,59 @@ function CommandPalette({ onClose }: { onClose: () => void }) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Rechercher une page, action..."
+            placeholder="Rechercher pages, leads, actions..."
             className="command-input dark:text-white"
             onKeyDown={(e) => {
-              if (e.key === "Enter" && filtered.length > 0) {
-                navigate(filtered[0].href);
+              if (e.key === "Enter" && allResults.length > 0) {
+                navigate(allResults[0].href);
               }
             }}
           />
-          <kbd className="px-1.5 py-0.5 bg-surface-100 dark:bg-white/5 rounded text-[10px] font-mono text-surface-400 shrink-0">
-            ESC
-          </kbd>
+          {searching && <div className="w-4 h-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin shrink-0" />}
+          <kbd className="px-1.5 py-0.5 bg-surface-100 dark:bg-white/5 rounded text-[10px] font-mono text-surface-400 shrink-0">ESC</kbd>
         </div>
 
-        {/* Results */}
         <div className="py-2 max-h-80 overflow-y-auto">
-          {filtered.length === 0 ? (
+          {allResults.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-surface-400">
               Aucun resultat pour &ldquo;{query}&rdquo;
             </div>
           ) : (
             <>
-              <div className="px-4 py-1.5 text-[10px] uppercase tracking-wider text-surface-400 font-medium">
-                Navigation
-              </div>
-              {filtered.map((cmd) => (
-                <button
-                  key={cmd.href}
-                  onClick={() => navigate(cmd.href)}
-                  className="command-item w-full"
-                >
-                  <span className="text-base">{cmd.icon}</span>
-                  <span className="text-sm">{cmd.label}</span>
-                </button>
-              ))}
+              {filteredPages.length > 0 && (
+                <>
+                  <div className="px-4 py-1.5 text-[10px] uppercase tracking-wider text-surface-400 font-medium">Pages</div>
+                  {filteredPages.map((cmd) => (
+                    <button key={cmd.href} onClick={() => navigate(cmd.href)} className="command-item w-full">
+                      <span className="text-base">{cmd.icon}</span>
+                      <span className="text-sm">{cmd.label}</span>
+                    </button>
+                  ))}
+                </>
+              )}
+              {filteredActions.length > 0 && (
+                <>
+                  <div className="px-4 py-1.5 text-[10px] uppercase tracking-wider text-surface-400 font-medium mt-1">Actions</div>
+                  {filteredActions.map((cmd) => (
+                    <button key={cmd.label} onClick={() => navigate(cmd.href)} className="command-item w-full">
+                      <span className="text-base">{cmd.icon}</span>
+                      <span className="text-sm">{cmd.label}</span>
+                    </button>
+                  ))}
+                </>
+              )}
+              {dynamicResults.length > 0 && (
+                <>
+                  <div className="px-4 py-1.5 text-[10px] uppercase tracking-wider text-surface-400 font-medium mt-1">Leads</div>
+                  {dynamicResults.map((r) => (
+                    <button key={r.href} onClick={() => navigate(r.href)} className="command-item w-full">
+                      <span className="text-base">{r.icon}</span>
+                      <span className="text-sm">{r.label}</span>
+                      <span className="text-[10px] text-surface-400 ml-auto">lead</span>
+                    </button>
+                  ))}
+                </>
+              )}
             </>
           )}
         </div>

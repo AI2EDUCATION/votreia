@@ -101,7 +101,7 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="#agents"
+              href="/demo"
               className="inline-flex items-center justify-center gap-2 text-base font-medium px-8 py-3.5 glass-white text-white/80 hover:text-white hover:bg-white/10 transition-all"
             >
               <Play className="w-4 h-4" />
@@ -336,9 +336,12 @@ export default function HomePage() {
                     Commencer l'essai
                   </Link>
                 ) : plan.price === "Sur mesure" ? (
-                  <button className="w-full py-3 glass-white text-white/70 font-medium hover:bg-white/10 transition-all text-center">
+                  <a
+                    href="mailto:contact@ai2-education.com?subject=Plan%20Commande%20Totale%20VotrIA"
+                    className="block w-full py-3 glass-white text-white/70 font-medium hover:bg-white/10 transition-all text-center"
+                  >
                     Nous contacter
-                  </button>
+                  </a>
                 ) : (
                   <Link
                     href="/auth/signup"
@@ -427,9 +430,12 @@ export default function HomePage() {
                   Demarrer l'essai gratuit
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                <button className="inline-flex items-center justify-center gap-2 text-base font-medium px-8 py-3.5 glass-white text-white/80 hover:text-white hover:bg-white/10 transition-all">
+                <a
+                  href="mailto:contact@ai2-education.com?subject=Demande%20de%20demo%20VotrIA"
+                  className="inline-flex items-center justify-center gap-2 text-base font-medium px-8 py-3.5 glass-white text-white/80 hover:text-white hover:bg-white/10 transition-all"
+                >
                   Demander une demo
-                </button>
+                </a>
               </div>
             </div>
           </div>

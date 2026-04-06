@@ -123,10 +123,13 @@ export function Sidebar() {
           </div>
         )}
 
-        <button className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-surface-500 hover:bg-surface-50 dark:hover:bg-white/[0.04] w-full transition-colors ${collapsed ? "justify-center" : ""}`}>
+        <a
+          href="mailto:contact@ai2-education.com?subject=Support%20VotrIA"
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-surface-500 hover:bg-surface-50 dark:hover:bg-white/[0.04] w-full transition-colors ${collapsed ? "justify-center" : ""}`}
+        >
           <HelpCircle className="w-5 h-5 shrink-0" />
           {!collapsed && <span>Aide</span>}
-        </button>
+        </a>
 
         {/* Collapse toggle */}
         <button
