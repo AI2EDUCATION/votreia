@@ -5,6 +5,7 @@ import { createSupabaseServer } from "@/lib/supabase-server";
 import { Clock, Cpu, CreditCard, Bot, Calendar, CheckCircle2, XCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { CopyButton } from "@/components/ui/copy-button";
+import { TaskRetryButton } from "@/components/dashboard/task-retry";
 import { notFound } from "next/navigation";
 
 async function getTenantId() {
@@ -140,11 +141,18 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
         </div>
       )}
 
-      {/* Error */}
+      {/* Error + Retry */}
       {t.error && (
         <div className="card p-5 border-l-4 border-l-red-500">
-          <h3 className="font-semibold text-sm text-red-700 dark:text-red-300 mb-1">Erreur</h3>
-          <p className="text-sm text-red-600 dark:text-red-400 font-mono">{t.error}</p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="font-semibold text-sm text-red-700 dark:text-red-300 mb-1">Erreur</h3>
+              <p className="text-sm text-red-600 dark:text-red-400 font-mono">{t.error}</p>
+            </div>
+            {t.agentId && input && (
+              <TaskRetryButton agentId={t.agentId} taskType={t.type} taskInput={input} />
+            )}
+          </div>
         </div>
       )}
     </div>

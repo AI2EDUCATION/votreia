@@ -204,6 +204,18 @@ function SecurityTab() {
   const [newPassword, setNewPassword] = useState("");
   const [passwordSaved, setPasswordSaved] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteEmail, setDeleteEmail] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const deleteAccount = trpc.profile.deleteAccount.useMutation({
+    onSuccess: () => {
+      window.location.href = "/auth/login?message=account-deleted";
+    },
+    onError: (err) => {
+      alert(err.message);
+      setDeleteLoading(false);
+    },
+  });
 
   async function handleChangePassword() {
     if (newPassword.length < 8) return;
@@ -280,14 +292,33 @@ function SecurityTab() {
         <h4 className="text-sm font-medium text-red-600 dark:text-red-400 mb-1">Zone de danger</h4>
         <p className="text-xs text-surface-400 mb-3">Actions irreversibles. Procedez avec precaution.</p>
         {deleting ? (
-          <div className="flex items-center gap-3">
-            <button className="btn-danger text-sm" onClick={() => { /* Would call delete API */ }}>
-              <Trash2 className="w-4 h-4" />
-              Confirmer la suppression
-            </button>
-            <button className="btn-secondary text-sm" onClick={() => setDeleting(false)}>
-              Annuler
-            </button>
+          <div className="space-y-3">
+            <p className="text-xs text-red-600 dark:text-red-400">
+              Tapez votre email pour confirmer la suppression definitive de votre compte et de toutes les donnees.
+            </p>
+            <input
+              type="email"
+              value={deleteEmail}
+              onChange={(e) => setDeleteEmail(e.target.value)}
+              placeholder="votre@email.fr"
+              className="input border-red-300 dark:border-red-500/30"
+            />
+            <div className="flex items-center gap-3">
+              <button
+                className="btn-danger text-sm"
+                onClick={() => {
+                  setDeleteLoading(true);
+                  deleteAccount.mutate({ confirmEmail: deleteEmail });
+                }}
+                disabled={!deleteEmail || deleteLoading}
+              >
+                {deleteLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Supprimer definitivement
+              </button>
+              <button className="btn-secondary text-sm" onClick={() => { setDeleting(false); setDeleteEmail(""); }}>
+                Annuler
+              </button>
+            </div>
           </div>
         ) : (
           <button className="btn-danger text-sm" onClick={() => setDeleting(true)}>

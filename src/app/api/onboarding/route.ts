@@ -3,7 +3,8 @@ import { db } from "@/db";
 import { tenants, users, agents } from "@/db/schema";
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { logAudit, getIpFromRequest } from "@/lib/audit";
-import { logError, ValidationError } from "@/lib/error-handler";
+import { logError } from "@/lib/error-handler";
+import { sendEmail, welcomeEmailTemplate } from "@/lib/notifications";
 import { z } from "zod";
 
 const onboardingSchema = z.object({
@@ -85,6 +86,19 @@ export async function POST(req: Request) {
       status: "setup",
       config: {},
     });
+
+    // Welcome email (best-effort)
+    try {
+      await sendEmail({
+        tenantId: tenant.id,
+        userId,
+        to: email,
+        subject: "Bienvenue sur VotrIA — Votre premier employe IA",
+        html: welcomeEmailTemplate({ fullName, company }),
+      });
+    } catch {
+      // Don't fail onboarding if email fails
+    }
 
     // Audit log
     await logAudit({

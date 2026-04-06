@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "../init";
-import { users } from "@/db/schema";
+import { users, tenants } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { logAudit } from "@/lib/audit";
 
@@ -75,4 +76,39 @@ export const profileRouter = router({
       notifications: userNotifs,
     };
   }),
+
+  /** Delete account + all tenant data (RGPD droit a l'oubli) */
+  deleteAccount: protectedProcedure
+    .input(z.object({ confirmEmail: z.string().email() }))
+    .mutation(async ({ ctx, input }) => {
+      // Verify email matches as confirmation
+      if (input.confirmEmail !== ctx.dbUser.email) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "L'email de confirmation ne correspond pas.",
+        });
+      }
+
+      await logAudit({
+        tenantId: ctx.tenantId,
+        userId: ctx.dbUser.id,
+        action: "account.deleted",
+        resource: "tenant",
+        resourceId: ctx.tenantId,
+      });
+
+      // Delete tenant (cascade deletes all related data: users, agents, tasks, leads, docs, etc.)
+      await ctx.db.delete(tenants).where(eq(tenants.id, ctx.tenantId));
+
+      // Delete Supabase auth user
+      try {
+        const { createSupabaseAdmin } = await import("@/lib/supabase-server");
+        const adminClient = createSupabaseAdmin();
+        await adminClient.auth.admin.deleteUser(ctx.dbUser.id);
+      } catch {
+        // Best effort — auth user cleanup
+      }
+
+      return { deleted: true };
+    }),
 });

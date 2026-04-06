@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Providers } from "@/components/providers";
+import { CookieConsent } from "@/components/ui/cookie-consent";
 import "./globals.css";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://app.votria.fr";
@@ -68,6 +69,7 @@ export default function RootLayout({
     <html lang="fr" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <body className="min-h-screen font-sans">
         <Providers>{children}</Providers>
+        <CookieConsent />
       </body>
     </html>
   );
